@@ -1,64 +1,59 @@
-# Healthcare Data Engineering Project
+# Health Data Engineering
 
-## Overview
+This project is focused on building a data engineering pipeline for healthcare data analysis. The pipeline encompasses data ingestion, cleaning, transformation, warehousing, and analysis using AWS technologies. The goal of the project is to create an ETL pipeline that processes and analyzes healthcare-related data, providing insights into patient admissions, hospital performance, and medical conditions.
 
-This project focuses on building a data pipeline for a healthcare dataset using AWS services like Lambda, S3, Redshift, and Glue. The project involves data cleaning, transformation, and analysis to provide valuable insights from hospital admissions and patient data.
+## Project Overview
 
-### Key Technologies Used:
-- **AWS S3**: Storage for raw and processed data.
-- **AWS Lambda**: Used for data cleaning and transformation.
-- **AWS Redshift**: Data warehousing for structured query-based analysis.
-- **SQL**: Used to perform data analysis on the Redshift warehouse.
-- **AWS Glue**: Data cataloging and processing of data for Redshift.
+### Steps Followed:
 
----
+1. **Data Ingestion (AWS S3)**
+   - **Data Storage**: The dataset was ingested and stored in an AWS S3 bucket in CSV format.
+   - **ETL Pipeline Initiation**: Used **AWS Lambda** to trigger the data transformation process upon new file uploads to the S3 bucket.
 
-## Project Steps
+2. **Data Cleaning & Transformation (AWS Lambda & Python)**
+   - **Data Cleaning**: The data was cleaned using **AWS Lambda** functions to standardize values and fix inconsistencies.
+     - Inconsistent name capitalizations (e.g., "Bobby JacksOn" → "Bobby Jackson") were corrected.
+     - Gender values were standardized to consistent terms (e.g., "Male", "Female").
+     - Medical conditions and blood types were validated and standardized.
+   - **Date Transformation**: Dates such as `Date of Admission` and `Discharge Date` were converted to the proper date format.
+   - **Handling Missing Data**: Managed missing values in `Test Results` and `Medication` columns and ensured the integrity of the dataset.
+   - **Billing Amount Validation**: Ensured that the `Billing Amount` column contained numeric values, and handled any discrepancies.
 
-### 1. **Data Ingestion (AWS S3)**:
-- The dataset was stored in an S3 bucket in CSV format.
-- AWS Lambda was triggered when new files were uploaded to S3.
+3. **Data Warehousing (AWS Redshift)**
+   - **Star Schema Design**: A star schema was designed in AWS Redshift for efficient querying:
+     - **Fact Table**: `patient_admissions` (contains details of patient admissions, billing amounts, dates, etc.)
+     - **Dimension Tables**: `patients`, `doctors`, `hospitals`, and `insurance_providers` (related data for analysis).
+   - **Data Loading**: Cleaned and transformed data was loaded into AWS Redshift using **SQL** and **Python (Boto3)** to automate the ETL pipeline.
 
-### 2. **Data Cleaning & Transformation (AWS Lambda)**:
-- The Lambda function cleaned the dataset by:
-  - Standardizing names, gender values, and medical conditions.
-  - Converting date fields (Admission & Discharge dates) to correct formats.
-  - Ensuring that Billing Amount is numeric.
-  - Handling missing or incorrect values in test results and medication data.
+4. **Data Analysis (SQL in Redshift)**
+   - Performed advanced data analysis using **SQL** queries in AWS Redshift:
+     - **Average Billing Analysis**: Calculated the average billing amount per hospital and medical condition.
+     - **Readmission Rate Analysis**: Tracked readmission rates across hospitals.
+     - **Condition Trends**: Analyzed common medical conditions based on age, gender, and hospital.
+   - The queries were designed to provide actionable insights into hospital performance, patient demographics, and treatment trends.
 
-### 3. **Data Warehousing (AWS Redshift)**:
-- Designed and implemented a star schema in Redshift with a fact table `Patient_Admissions` and dimension tables like `Patients`, `Doctors`, `Hospitals`, and `Insurance_Providers`.
-- Cleaned data was loaded into AWS Redshift using Python (Boto3).
+5. **Data Visualization**
+   - Used **AWS Redshift’s built-in charting capabilities** to visualize the results of the SQL queries.
+   - Created key visualizations such as:
+     - Average billing amount by hospital and condition.
+     - Readmission rates by hospital.
+     - Most common medical conditions across different age groups.
+   - The charts were used to gain insights into healthcare trends and help healthcare providers make data-driven decisions.
 
-### 4. **Data Analysis**:
-- Performed SQL queries in Redshift to derive valuable insights like:
-  - Average billing amount per hospital/condition.
-  - Readmission rates per hospital.
-  - Medical conditions by age & gender.
+## Technologies Used:
+- **AWS S3** for data storage and ingestion.
+- **AWS Lambda** for data cleaning, transformation, and automation of the ETL pipeline.
+- **AWS Redshift** for data warehousing, querying, and analysis.
+- **SQL** for querying and aggregating data in Redshift.
+- **Python (Boto3)** for interacting with AWS services.
+- **AWS QuickSight** (optional for future visualization, but used Redshift's built-in charting for this project).
 
----
-
-## How to Run the Project:
-
-### Step 1: Setup AWS Services
-- Set up **AWS S3** for storing data files.
-- Set up **AWS Lambda** for data cleaning.
-- Set up **AWS Redshift** for data warehousing.
-- Load the dataset into S3 and trigger Lambda for processing.
-
-### Step 2: Data Transformation
-- Lambda functions are used to clean and transform data.
-
-### Step 3: Load Cleaned Data into Redshift
-- Load the cleaned data into Redshift using Python and Boto3.
-
-### Step 4: Run SQL Queries
-- Use SQL queries in Redshift to analyze the data and generate insights.
-
----
+## Key Learnings:
+- Understanding of **ETL pipelines** and the use of AWS services for data processing.
+- Data cleaning, transformation, and validation techniques.
+- Designing and optimizing data warehouses in **AWS Redshift**.
+- Running SQL queries to derive meaningful insights from structured data.
+- Using **AWS Lambda** for automating ETL processes in real-time.
 
 ## Conclusion:
-
-This project demonstrates the use of AWS services to process, clean, transform, and analyze healthcare data. The insights from this project can provide valuable metrics for hospitals, such as average billing amounts, readmission rates, and trends in medical conditions.
-
----
+This project demonstrates the use of AWS services to create an efficient and scalable data engineering pipeline for healthcare data. It covers the entire ETL process, from data ingestion to cleaning, transformation, and analysis. The insights gained from this pipeline can be used for decision-making and optimizing healthcare operations.
