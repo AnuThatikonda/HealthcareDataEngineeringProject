@@ -1,0 +1,91 @@
+-- Create the FACT (patient_admissions) Table in Redshift
+
+CREATE TABLE patient_admissions (
+    admission_id INT IDENTITY(1,1) PRIMARY KEY,
+    name VARCHAR(100),
+    age INT,
+    gender VARCHAR(10),
+    blood_type VARCHAR(10),
+    medical_condition VARCHAR(100),
+    date_of_admission DATE,
+    doctor VARCHAR(100),
+    hospital VARCHAR(100),
+    insurance_provider VARCHAR(100),
+    billing_amount DECIMAL(10, 2),
+    room_number VARCHAR(10),
+    admission_type VARCHAR(50),
+    discharge_date DATE,
+    medication VARCHAR(255),
+    test_results VARCHAR(255)
+);
+
+
+-- Load the Data Using the COPY Command
+
+COPY patient_admissions
+FROM 's3://your-bucket-name/cleaned/healthcare_dataset.csv'
+IAM_ROLE 'arn:aws:iam::your-account-id:role/HealthcareRedshiftS3Access'
+CSV
+IGNOREHEADER 1;
+
+-- Create DIMENSION Tables
+
+-- Create a Doctor Dimension Table
+CREATE TABLE doctors (
+    doctor_id INT IDENTITY(1, 1),
+    doctor_name VARCHAR(255)
+);
+
+-- Populate the Doctor Dimension Table
+INSERT INTO doctors (doctor_name)
+SELECT DISTINCT doctor
+FROM patient_admissions;
+
+-- Create a Hospital Dimension Table
+CREATE TABLE hospitals (
+    hospital_id INT IDENTITY(1, 1),
+    hospital_name VARCHAR(255)
+);
+
+-- Populate the Hospital Dimension Table
+INSERT INTO hospitals (hospital_name)
+SELECT DISTINCT hospital
+FROM patient_admissions;
+
+-- Create an Insurance Provider Dimension Table
+CREATE TABLE insurance_providers (
+    insurance_provider_id INT IDENTITY(1, 1),
+    insurance_provider_name VARCHAR(255)
+);
+
+-- Populate the Insurance Provider Dimension Table
+INSERT INTO insurance_providers (insurance_provider_name)
+SELECT DISTINCT insurance_provider
+FROM patient_admissions;
+
+
+-- Update the Fact Table
+
+-- Add foreign key columns to the patient_admissions fact table
+ALTER TABLE patient_admissions
+ADD COLUMN doctor_id INT,
+ADD COLUMN hospital_id INT,
+ADD COLUMN insurance_provider_id INT;
+
+-- Populate the foreign key columns by joining with the dimension tables
+UPDATE patient_admissions pa
+SET doctor_id = d.doctor_id
+FROM doctors d
+WHERE pa.doctor = d.doctor_name;
+
+UPDATE patient_admissions pa
+SET hospital_id = h.hospital_id
+FROM hospitals h
+WHERE pa.hospital = h.hospital_name;
+
+UPDATE patient_admissions pa
+SET insurance_provider_id = ip.insurance_provider_id
+FROM insurance_providers ip
+WHERE pa.insurance_provider = ip.insurance_provider_name;
+
+

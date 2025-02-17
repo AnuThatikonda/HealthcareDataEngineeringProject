@@ -1,0 +1,79 @@
+-- Average Billing Amount Per Hospital & Medical Condition:
+
+SELECT h.hospital_name, pa.medical_condition, AVG(pa.billing_amount) AS avg_billing
+FROM patient_admissions pa
+JOIN hospitals h ON pa.hospital_id = h.hospital_id
+GROUP BY h.hospital_name, pa.medical_condition
+ORDER BY avg_billing DESC;
+
+-- Readmission Rates per Hospital:
+
+SELECT h.hospital_name, 
+       COUNT(DISTINCT pa.name) AS total_patients, 
+       COUNT(pa.name) AS total_admissions,
+       (COUNT(pa.name) - COUNT(DISTINCT pa.name)) * 100.0 / COUNT(pa.name) AS readmission_rate
+FROM patient_admissions pa
+JOIN hospitals h ON pa.hospital_id = h.hospital_id
+GROUP BY h.hospital_name
+ORDER BY readmission_rate DESC;
+
+
+-- Common Medical Conditions by Age and Gender
+
+SELECT pa.medical_condition, 
+       pa.age,
+       pa.gender,
+       COUNT(pa.name) AS total_cases
+FROM patient_admissions pa
+GROUP BY pa.medical_condition, pa.age, pa.gender
+ORDER BY total_cases DESC;
+
+
+-- Track Readmission Rates by Age Group
+
+SELECT 
+       CASE 
+           WHEN pa.age BETWEEN 0 AND 18 THEN '0-18'
+           WHEN pa.age BETWEEN 19 AND 40 THEN '19-40'
+           WHEN pa.age BETWEEN 41 AND 60 THEN '41-60'
+           WHEN pa.age BETWEEN 61 AND 80 THEN '61-80'
+           ELSE '80+' 
+       END AS age_group,
+       COUNT(DISTINCT pa.name) AS total_patients,
+       COUNT(pa.name) AS total_admissions,
+       (COUNT(pa.name) - COUNT(DISTINCT pa.name)) * 100.0 / COUNT(pa.name) AS readmission_rate
+FROM patient_admissions pa
+GROUP BY age_group
+ORDER BY age_group;
+
+-- Average Billing Amount By Condition and Gender
+SELECT pa.medical_condition, 
+       pa.gender,
+       AVG(pa.billing_amount) AS avg_billing_amount
+FROM patient_admissions pa
+GROUP BY pa.medical_condition, pa.gender;
+
+-- Top 5 Doctors with the Highest Number of Admissions:
+SELECT d.doctor_name, COUNT(*) AS total_admissions
+FROM patient_admissions pa
+JOIN doctors d ON pa.doctor_id = d.doctor_id
+GROUP BY d.doctor_name
+ORDER BY total_admissions DESC
+LIMIT 5;
+
+-- Average Length of Stay by Admission Type:
+SELECT pa.admission_type, 
+       AVG(DATEDIFF(day, pa.date_of_admission, pa.discharge_date)) AS avg_stay_length
+FROM patient_admissions pa
+GROUP BY pa.admission_type
+ORDER BY avg_stay_length DESC;
+
+-- Most Common Medical Conditions by Age 
+SELECT 
+       pa.medical_condition,
+       pa.age,
+       COUNT(pa.name) AS total_cases
+FROM patient_admissions pa
+GROUP BY pa.medical_condition, pa.age
+ORDER BY total_cases DESC;
+
