@@ -1,4 +1,4 @@
-# Health Data Engineering
+# Healthcare Data Engineering
 
 This project is focused on building a data engineering pipeline for healthcare data analysis. The pipeline encompasses data ingestion, cleaning, transformation, warehousing, and analysis using AWS technologies. The goal of the project is to create an ETL pipeline that processes and analyzes healthcare-related data, providing insights into patient admissions, hospital performance, and medical conditions.
 
